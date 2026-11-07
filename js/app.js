@@ -334,7 +334,8 @@ const V = {
         )
         .join(
           ""
-        )}
+        )}</div>${dv}<div class="actions"><span>Meta: concluir o cadastro em até 3 minutos (RF001)</span><button class="btn sec" type="reset">Cancelar</button><button class="btn">Salvar cadastro</button></div></form>`,
+
     turmas: () =>
       head("Turmas e disciplinas", "Estrutura escolar cadastrada") +
       `<div class="grid2">${card(
