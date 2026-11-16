@@ -1,0 +1,14 @@
+UniEdu - back-end completo (RF001 a RF015 e RNF005)
+
+ANTES DE RODAR
+1. Rode no pgAdmin (Query Tool, banco uniedu) o arquivo migracao_rf008.sql. Ele acrescenta ao aviso o destino e a turma (RF008).
+   Sem isso a aplicação não sobe (ddl-auto=validate acusa coluna faltando).
+2. Extraia este zip por cima da pasta do seu back (a que tem o pom.xml). O application.properties não vem no zip.
+3. Backup (RNF005): precisa do pg_dump (vem com o PostgreSQL). Se o comando "pg_dump" não for reconhecido no seu computador,
+   acrescente no application.properties o caminho completo, por exemplo:
+   uniedu.backup.pg-dump=C:/Program Files/PostgreSQL/16/bin/pg_dump.exe
+   Opcionais (já têm valor padrão):
+   uniedu.backup.cron=0 0 2 * * *     (todo dia às 02:00)
+   uniedu.backup.dir=backups          (pasta dos arquivos .sql)
+   uniedu.backup.manter-dias=30       (apaga backups mais antigos que isso)
+   Coloque a pasta backups no .gitignore.

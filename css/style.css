@@ -721,3 +721,7 @@ main {
     flex-wrap: wrap;
   }
 }
+/*ligação com a API*/
+.lk{color:var(--title);font-weight:600;text-decoration:none;white-space:nowrap}
+.lk:hover{text-decoration:underline}
+.empty{color:var(--mute);margin:0;padding:6px 0}
