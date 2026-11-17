@@ -1,4 +1,4 @@
-const API=(window.UNIEDU_API||"http://localhost:8080")+"/api";
+const API=(window.UNIEDU_API||"https://uniedu.onrender.com")+"/api";
 const MEDIA_APROVACAO=6;                     
 const LIMITE_ABAIXO=3;                       
 const ANO_MINIMO=2000;                       
