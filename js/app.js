@@ -380,9 +380,25 @@ document.addEventListener("click",e=>{
  else if("cancel" in d){PF.edit=null;savePF();render()}
  else if(d.edit){PF.edit={t:tabAtual(),cod:+par(d.edit)[1]};savePF();window.scrollTo(0,0);render()}
  else if(d.goedit){const [ti,c]=par(d.goedit);PF.tab=ti;PF.edit={t:ti,cod:+c};savePF();location.href=url("admin","cadastros")}
- else if(d.ativo){const [cu,v]=par(d.ativo);
-  confirmar(v?"Ativar este usuário? Ele voltará a poder entrar no sistema.":"Desativar este usuário? Ele perderá o acesso ao sistema.",v?"Ativar usuário":"Desativar usuário").then(ok=>{if(!ok)return;run(async()=>{await api("/usuarios/"+cu+"/ativo",{method:"PUT",body:{ativo:!!v}});toast(v?"Usuário ativado.":"Usuário desativado.");render()})});
- }
+ else if(d.ativo){
+  const [cu,valor]=par(d.ativo),ativar=Number(valor)===1;
+  confirmar(
+    ativar
+      ? "Ativar este usuário? Ele voltará a poder entrar no sistema."
+      : "Desativar este usuário? Ele perderá o acesso ao sistema.",
+    ativar ? "Ativar usuário" : "Desativar usuário"
+  ).then(ok=>{
+    if(!ok)return;
+    run(async()=>{
+      await api("/usuarios/"+cu+"/ativo",{
+        method:"PUT",
+        body:{ativo:ativar}
+      });
+      toast(ativar ? "Usuário ativado." : "Usuário desativado.");
+      render();
+    });
+  });
+}
  else if(d.del){const [ti,c]=par(d.del),rota=ROTA_EXCLUIR[ti];if(!rota)return;
   confirmar("Excluir este(a) "+ti.toLowerCase()+"? Só é possível excluir se não houver dados ligados a ele(a).","Excluir "+ti.toLowerCase()).then(ok=>{if(!ok)return;run(async()=>{await api(rota+c,{method:"DELETE"});toast(ti+" excluída.");if(PF.edit&&PF.edit.t===ti)PF.edit=null;render()})});
  }
@@ -392,10 +408,10 @@ document.addEventListener("click",e=>{
   let ok=0,erro=null;
   for(const r of document.querySelectorAll("[data-aluno]")){
    const [a,b]=[...r.querySelectorAll(".ni")].map(i=>num(i.value));
-   if(isNaN(a)&&isNaN(b))continue;                              // nada digitado: mantém a nota já lançada
+   if(isNaN(a)&&isNaN(b))continue;                             
    if(isNaN(a)||isNaN(b)||a<0||a>10||b<0||b>10){erro="Preencha as duas notas (de 0 a 10) de cada aluno.";break}
    const body={codAluno:+r.dataset.aluno,codDisciplina:+r.dataset.disc,unidade:+r.dataset.un,valor:r2((a+b)/2)};
-   await api("/notas",{method:r.dataset.novo==="1"?"POST":"PUT",body});ok++;   // cria no POST, altera no PUT
+   await api("/notas",{method:r.dataset.novo==="1"?"POST":"PUT",body});ok++;   
   }
   if(erro){toast(erro);return}
   toast(ok?ok+" nota(s) salva(s). Desempenho atualizado.":"Nenhuma nota preenchida.");
@@ -412,7 +428,7 @@ document.addEventListener("click",e=>{
 });
 
 document.addEventListener("change",e=>{
- const s=e.target.closest("[data-name=destino]");            // destino PROFESSORES não usa turma
+ const s=e.target.closest("[data-name=destino]");           
  if(s){const t=document.querySelector("[data-name=codTurma]");
   if(t){const off=s.value==="PROFESSORES";t.disabled=off;t.closest(".field").style.opacity=off?".45":""}
   PF.destino=s.value;savePF();return}
@@ -425,7 +441,7 @@ document.addEventListener("input",e=>{
  if(!e.target.matches(".ni"))return;
  const r=e.target.closest(".tr"),[a,b]=[...r.querySelectorAll(".ni")].map(i=>num(i.value)),x=r.querySelector(".mm"),s=r.querySelector(".st");
  const atual=r.dataset.atual?num(r.dataset.atual):NaN;
- if(isNaN(a)||isNaN(b)){                                       // volta a mostrar a nota já lançada
+ if(isNaN(a)||isNaN(b)){                                       
   if(isNaN(atual)){x.textContent="–";x.style.color="var(--mute)";s.innerHTML=""}
   else{x.textContent=f1(atual);x.style.color=atual>=MEDIA_APROVACAO?"var(--green)":"var(--red)";s.innerHTML=sit(atual)}
   return}
@@ -447,7 +463,7 @@ document.addEventListener("submit",e=>{
    const tab=tabAtual(),cod=PF.edit&&PF.edit.t===tab?PF.edit.cod:null,b={};
    if(tab==="Aluno"||tab==="Professor"){
     b.nome=tx(d.nome);b.email=tx(d.email);b.login=tx(d.login);
-    if(tx(d.senha))b.senha=tx(d.senha);                        // em branco mantém a senha atual
+    if(tx(d.senha))b.senha=tx(d.senha);                      
     if(tab==="Aluno"){b.matricula=nz(d.matricula);b.codTurma=nz(d.codTurma)}
     await api(ROTA[tab]+(cod?"/"+cod:""),{method:cod?"PUT":"POST",body:b});
    }else if(tab==="Turma"){
@@ -464,7 +480,7 @@ document.addEventListener("submit",e=>{
    PF.docAluno=d.codAluno;savePF();fim("Documento enviado ao aluno.");
   }else if(id==="af"){
    const destino=ROLEP==="prof"?"ALUNOS":(tx(d.destino)||"TODOS"),body={titulo:tx(d.titulo),mensagem:tx(d.mensagem),codUsuario:U.codUsuario,destino};
-   if(destino!=="PROFESSORES")body.codTurma=nz(d.codTurma);     // turma vale só para TODOS e ALUNOS
+   if(destino!=="PROFESSORES")body.codTurma=nz(d.codTurma);     
    await api("/avisos",{method:"POST",body});
    PF.destino=destino;PF.avTurma="";savePF();fim("Aviso publicado.");
   }
